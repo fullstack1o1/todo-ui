@@ -56,6 +56,10 @@ export const UserPosts = () => {
         <CircularProgress />
       ) : (
         <div className="posts">
+          <div className="user_name">
+            <h1>User{userId}</h1>
+          </div>
+
           {userPosts.data.length > 0 ? (
             <>
               {" "}
