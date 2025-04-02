@@ -7,7 +7,7 @@ export enum APIStatus {
   FAILED,
   IDLE,
 }
-interface IApiResponse<T> {
+export interface IApiResponse<T> {
   data: T;
   error?: string;
   status: APIStatus;
