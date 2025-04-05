@@ -1,18 +1,18 @@
-import { Button, CircularProgress, Modal } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import CreateTodo from '../../component/CreateTodo.component';
-import { Post } from '../../component/Post/Post.component';
-import { useAppDispatch, useAppSelector } from '../../store/hook';
-import { APIStatus, fetchUserPosts } from '../../store/todo.slice';
-import './index.css';
+import { Button, CircularProgress, Modal } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import CreateTodo from "../../component/CreateTodo.component";
+import { Post } from "../../component/Post/Post.component";
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { APIStatus, fetchUserPosts } from "../../store/todo.slice";
+import "./index.css";
 
 export const UserPosts = () => {
   const { userId } = useParams();
   const dispatch = useAppDispatch();
   const { userPosts } = useAppSelector((state) => state.todoSlice);
   const createTodoStatus = useAppSelector(
-    (state) => state.cteateTodo.createTodo.status
+    (state) => state.todoSlice.createTodo.status
   );
   const [open, setOpen] = useState<boolean>(false);
 
@@ -38,13 +38,13 @@ export const UserPosts = () => {
   };
 
   return (
-    <div className='parent'>
+    <div className="parent">
       <div>
         <Modal
           open={open}
           onClose={closeModal}
-          aria-labelledby='modal-modal-title'
-          aria-describedby='modal-modal-description'
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
         >
           <CreateTodo onClose={closeModal} />
         </Modal>
@@ -53,20 +53,20 @@ export const UserPosts = () => {
       {userPosts.status === APIStatus.PENDING ? (
         <CircularProgress />
       ) : (
-        <div className='posts'>
-          <div className='user_name'>
+        <div className="posts">
+          <div className="user_name">
             <h1>User{userId}</h1>
           </div>
 
           {userPosts.data.length > 0 ? (
             <>
-              {' '}
-              <div className='btn'>
-                <Button variant='contained' onClick={openModal}>
+              {" "}
+              <div className="btn">
+                <Button variant="contained" onClick={openModal}>
                   Add new
                 </Button>
               </div>
-              <div className='posts-wrapper'>
+              <div className="posts-wrapper">
                 {userPosts.data.map((post, index) => (
                   <Post task={post} key={index} />
                 ))}
