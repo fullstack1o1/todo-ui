@@ -1,38 +1,34 @@
-import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
-import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { TaskStatus } from "../myApi";
-import { createNewTodo } from "../store/todo.slice";
-import { useAppDispatch } from "../store/hook";
+import { Box, Button, MenuItem, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Task, TaskStatus } from '../myApi';
+import { useAppDispatch } from '../store/hook';
+import { createNewTodo, updateTodo } from '../store/todo.slice';
 
 const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: "background.paper",
+  bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
   borderRadius: 5,
 };
 
-const CreateTodo = ({ onClose }: { onClose: () => void }) => {
+const CreateTodo = ({ onClose, data }: { onClose: () => void; data: Task }) => {
   const { userId } = useParams();
   const dispatch = useAppDispatch();
   console.log(userId);
 
   const [errorState, setErrorState] = useState({
-    title: "",
-    desc: "",
+    title: '',
+    desc: '',
   });
 
-  const [todo, setTodo] = useState({
-    title: "",
-    description: "",
-    status: TaskStatus.PENDING,
-    date: "",
-    //tags: [{ taskId: 0, tagId: 0 }],
+  const [todo, setTodo] = useState<Task>({
+    ...data,
   });
 
   const handleChange = (
@@ -43,45 +39,49 @@ const CreateTodo = ({ onClose }: { onClose: () => void }) => {
     setTodo({ ...todo, [e.target.name]: e.target.value });
     console.log(todo);
     const errState = {
-      title: "",
-      desc: "",
+      title: '',
+      desc: '',
     };
-    if (e.target.name === "title" && e.target.value.length === 0) {
-      errState.title = "Please enter something";
+    if (e.target.name === 'title' && e.target.value.length === 0) {
+      errState.title = 'Please enter something';
     }
-    if (e.target.name === "description" && e.target.value.length === 0) {
-      errState.desc = "Please enter something";
+    if (e.target.name === 'description' && e.target.value.length === 0) {
+      errState.desc = 'Please enter something';
     }
     setErrorState(errState);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = () => {
     if (userId) {
-      const localTodo = todo;
-      localTodo.date = new Date().toISOString();
-      dispatch(createNewTodo({ userId, todo }));
+      if (todo.taskId) {
+        // Update the task
+        dispatch(updateTodo({ userId, todo }));
+      } else {
+        const localTodo = todo;
+        localTodo.date = new Date().toISOString();
+        dispatch(createNewTodo({ userId, todo: localTodo }));
+      }
     }
     setTodo({
-      title: "",
-      description: "",
+      title: '',
+      description: '',
       status: TaskStatus.PENDING,
-      date: "",
+      date: '',
+      tags: [],
     });
     onClose();
   };
 
   return (
     <Box sx={style}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
+      <Typography variant='h5' sx={{ mb: 2 }}>
         Create New To-Do
       </Typography>
 
       <TextField
-        label="Title"
+        label='Title'
         fullWidth
-        name="title"
+        name='title'
         value={todo.title}
         onChange={handleChange}
         sx={{ mb: 2 }}
@@ -89,11 +89,11 @@ const CreateTodo = ({ onClose }: { onClose: () => void }) => {
         helperText={errorState.title}
       />
       <TextField
-        label="Description"
+        label='Description'
         fullWidth
         multiline
         rows={3}
-        name="description"
+        name='description'
         value={todo.description}
         onChange={handleChange}
         sx={{ mb: 2 }}
@@ -102,16 +102,16 @@ const CreateTodo = ({ onClose }: { onClose: () => void }) => {
       />
       <TextField
         select
-        label="Status"
+        label='Status'
         fullWidth
-        name="status"
+        name='status'
         value={todo.status}
         onChange={handleChange}
         sx={{ mb: 2 }}
       >
-        <MenuItem value="PENDING">Open</MenuItem>
-        <MenuItem value="IN_PROGRESS">Started</MenuItem>
-        <MenuItem value="COMPLETED">Done</MenuItem>
+        <MenuItem value='PENDING'>Open</MenuItem>
+        <MenuItem value='IN_PROGRESS'>Started</MenuItem>
+        <MenuItem value='COMPLETED'>Done</MenuItem>
       </TextField>
 
       {/* <Typography variant='h6' sx={{ mt: 2 }}>
@@ -121,12 +121,12 @@ const CreateTodo = ({ onClose }: { onClose: () => void }) => {
       {/* <Button>+ Add Tag</Button> */}
 
       <Button
-        onClick={handleSubmit}
-        variant="contained"
-        color="primary"
+        onClick={() => handleSubmit()}
+        variant='contained'
+        color='primary'
         fullWidth
         sx={{ mt: 3 }}
-        disabled={!(todo.description.length && todo.title.length)}
+        disabled={!(todo.description?.length && todo.title.length)}
       >
         Create To-Do
       </Button>
