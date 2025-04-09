@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Api, Task, TaskUpdate } from '../myApi';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { Api, Task, TaskUpdate } from "../myApi";
 
 export enum APIStatus {
   PENDING,
@@ -16,6 +16,8 @@ export interface IApiResponse<T> {
 interface IState {
   userPosts: IApiResponse<Task[]>;
   createTodo: IApiResponse<Task>;
+  updateTodo: IApiResponse<Task>;
+  deleteTodo: IApiResponse<null>;
 }
 
 interface CreateTodoArgs {
@@ -25,23 +27,28 @@ interface CreateTodoArgs {
 
 const api = new Api({
   baseUrl:
-    'https://todo-app.whitewater-d0b6f62a.westeurope.azurecontainerapps.io/todo',
+    "https://todo-app.whitewater-d0b6f62a.westeurope.azurecontainerapps.io/todo",
 });
 
 const initialState: IState = {
   userPosts: { data: [], status: APIStatus.IDLE },
   createTodo: {
     data: {
-      title: '',
+      title: "",
       tags: [],
-      date: '',
+      date: "",
     },
     status: APIStatus.IDLE,
   },
+  updateTodo: {
+    data: { title: "", tags: [], date: "" },
+    status: APIStatus.IDLE,
+  },
+  deleteTodo: { data: null, status: APIStatus.IDLE },
 };
 
 export const fetchUserPosts = createAsyncThunk(
-  'todoSlice/fetchUserPosts',
+  "todoSlice/fetchUserPosts",
   async (userId: string) => {
     const res = await api.userId.tasksDetail(userId);
     return res.data;
@@ -49,7 +56,7 @@ export const fetchUserPosts = createAsyncThunk(
 );
 
 export const createNewTodo = createAsyncThunk(
-  'createTodoSlice/createNewTodo',
+  "createTodoSlice/createNewTodo",
   async ({ userId, todo }: CreateTodoArgs) => {
     const res = await api.userId.tasksCreate(userId, todo);
     return res.data;
@@ -57,7 +64,7 @@ export const createNewTodo = createAsyncThunk(
 );
 
 export const updateTodo = createAsyncThunk(
-  'createTodoSlice/updateTodo',
+  "createTodoSlice/updateTodo",
   async ({ userId, todo }: CreateTodoArgs) => {
     const updatedData: TaskUpdate = { ...todo, taskId: todo.taskId! };
     const res = await api.userId.tasksUpdate(todo.taskId!, userId, updatedData);
@@ -65,8 +72,15 @@ export const updateTodo = createAsyncThunk(
   }
 );
 
+export const deleteTodo = createAsyncThunk(
+  "deleteTodoSlice/deleteTodo",
+  async ({ userId, todo }: CreateTodoArgs) => {
+    await api.userId.tasksDelete(todo.taskId!, userId);
+  }
+);
+
 export const todoSlice = createSlice({
-  name: 'todo',
+  name: "todo",
   initialState,
   reducers: {},
   extraReducers(builder) {
@@ -76,7 +90,7 @@ export const todoSlice = createSlice({
       })
       .addCase(fetchUserPosts.rejected, (state) => {
         state.userPosts.status = APIStatus.FAILED;
-        state.userPosts.error = 'Some Error Occured';
+        state.userPosts.error = "Some Error Occured";
       })
       .addCase(fetchUserPosts.fulfilled, (state, action) => {
         state.userPosts.status = APIStatus.FULLFILLED;
@@ -91,10 +105,31 @@ export const todoSlice = createSlice({
       .addCase(createNewTodo.fulfilled, (state, action) => {
         state.createTodo.status = APIStatus.FULLFILLED;
         state.createTodo.data = action.payload;
+      })
+      //update
+      .addCase(updateTodo.pending, (state) => {
+        state.updateTodo.status = APIStatus.PENDING;
+      })
+      .addCase(updateTodo.rejected, (state) => {
+        state.updateTodo.status = APIStatus.FAILED;
+      })
+      .addCase(updateTodo.fulfilled, (state, action) => {
+        state.updateTodo.status = APIStatus.FULLFILLED;
+        state.updateTodo.data = action.payload;
+      })
+      //delete
+      .addCase(deleteTodo.pending, (state) => {
+        state.deleteTodo.status = APIStatus.PENDING;
+      })
+      .addCase(deleteTodo.rejected, (state) => {
+        state.deleteTodo.status = APIStatus.FAILED;
+      })
+      .addCase(deleteTodo.fulfilled, (state) => {
+        state.deleteTodo.status = APIStatus.FULLFILLED;
       });
   },
 });
 
-todoSlice.actions = { fetchUserPosts, createNewTodo };
+todoSlice.actions = { fetchUserPosts, createNewTodo, updateTodo };
 
 export default todoSlice.reducer;

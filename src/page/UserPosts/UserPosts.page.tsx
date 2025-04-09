@@ -1,26 +1,36 @@
-import { Button, CircularProgress, Modal } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import CreateTodo from '../../component/CreateTodo.component';
-import { Post } from '../../component/Post/Post.component';
-import { Task, TaskStatus } from '../../myApi';
-import { useAppDispatch, useAppSelector } from '../../store/hook';
-import { APIStatus, fetchUserPosts } from '../../store/todo.slice';
-import './index.css';
+import { Button, CircularProgress, Modal } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import CreateTodo from "../../component/CreateTodo.component";
+import { Post } from "../../component/Post/Post.component";
+import { Task, TaskStatus } from "../../myApi";
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { APIStatus, fetchUserPosts } from "../../store/todo.slice";
+import "./index.css";
 
 export const UserPosts = () => {
   const { userId } = useParams();
   const dispatch = useAppDispatch();
   const { userPosts } = useAppSelector((state) => state.todoSlice);
+
   const createTodoStatus = useAppSelector(
     (state) => state.todoSlice.createTodo.status
   );
+
+  const updateTodoStatus = useAppSelector(
+    (state) => state.todoSlice.updateTodo.status
+  );
+
+  const deleteTodoStatus = useAppSelector(
+    (state) => state.todoSlice.deleteTodo.status
+  );
+
   const [open, setOpen] = useState<boolean>(false);
 
   const initialData = {
-    description: '',
-    title: '',
-    date: '',
+    description: "",
+    title: "",
+    date: "",
     status: TaskStatus.PENDING,
     tags: [],
   };
@@ -35,11 +45,24 @@ export const UserPosts = () => {
   }, [userId]);
 
   useEffect(() => {
-    if (userId && createTodoStatus === APIStatus.FULLFILLED) {
-      dispatch(fetchUserPosts(userId));
+    if (userId) {
+      if (
+        createTodoStatus === APIStatus.FULLFILLED ||
+        updateTodoStatus === APIStatus.FULLFILLED
+      ) {
+        dispatch(fetchUserPosts(userId));
+      }
+
+      if (updateTodoStatus === APIStatus.FULLFILLED) {
+        closeModal();
+      }
+
+      if (deleteTodoStatus === APIStatus.FULLFILLED) {
+        dispatch(fetchUserPosts(userId));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createTodoStatus]);
+  }, [createTodoStatus, updateTodoStatus, deleteTodoStatus]);
 
   const openModal = () => {
     setOpen(true);
@@ -50,19 +73,19 @@ export const UserPosts = () => {
   };
 
   const openEditModal = (task: Task) => {
-    console.log('open edit modal', task);
+    console.log("open edit modal", task);
     setEditModalData(task);
     openModal();
   };
 
   return (
-    <div className='parent'>
+    <div className="parent">
       <div>
         <Modal
           open={open}
           onClose={closeModal}
-          aria-labelledby='modal-modal-title'
-          aria-describedby='modal-modal-description'
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
         >
           <CreateTodo onClose={closeModal} data={editModalData} />
         </Modal>
@@ -71,20 +94,18 @@ export const UserPosts = () => {
       {userPosts.status === APIStatus.PENDING ? (
         <CircularProgress />
       ) : (
-        <div className='posts'>
-          <div className='user_name'>
+        <div className="posts">
+          <div className="user_name">
             <h1>User{userId}</h1>
           </div>
-
+          <div className="btn">
+            <Button variant="contained" onClick={openModal}>
+              Add new
+            </Button>
+          </div>
           {userPosts.data.length > 0 ? (
             <>
-              {' '}
-              <div className='btn'>
-                <Button variant='contained' onClick={openModal}>
-                  Add new
-                </Button>
-              </div>
-              <div className='posts-wrapper'>
+              <div className="posts-wrapper">
                 {userPosts.data.map((post, index) => (
                   <Post task={post} key={index} openEditModal={openEditModal} />
                 ))}
