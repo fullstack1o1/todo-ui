@@ -75,7 +75,7 @@ const CreateTodo = ({ onClose, data }: { onClose: () => void; data: Task }) => {
   return (
     <Box sx={style}>
       <Typography variant='h5' sx={{ mb: 2 }}>
-        Create New To-Do
+        {todo?.taskId ? 'Update To-Do' : 'Create New To-Do'}
       </Typography>
 
       <TextField
@@ -128,7 +128,7 @@ const CreateTodo = ({ onClose, data }: { onClose: () => void; data: Task }) => {
         sx={{ mt: 3 }}
         disabled={!(todo.description?.length && todo.title.length)}
       >
-        Create To-Do
+        {todo?.taskId ? 'Update To-Do' : 'Create To-Do'}
       </Button>
     </Box>
   );

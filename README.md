@@ -11,6 +11,7 @@ Small
 4. edit a todo
 5. Delete a todo
 6. Get single todo
+7. support dates in todo creation
 
 Next steps
 

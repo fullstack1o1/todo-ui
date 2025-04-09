@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Api, Task, TaskUpdate } from "../myApi";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Api, Task, TaskUpdate } from '../myApi';
 
 export enum APIStatus {
   PENDING,
@@ -7,6 +7,19 @@ export enum APIStatus {
   FAILED,
   IDLE,
 }
+
+export enum DateFilter {
+  TODAY_TODO = 'TODAY_TODO',
+  TOMORROW_TODO = 'TOMORROW_TODO',
+  CURRENT_WEEK_TODO = 'CURRENT_WEEK_TODO',
+  LAST_WEEK_TODO = 'LAST_WEEK_TODO',
+  NEXT_WEEK_TODO = 'NEXT_WEEK_TODO',
+  LAST_MONTH = 'LAST_MONTH',
+  CURRENT_MONTH = 'CURRENT_MONTH',
+  NEXT_MONTH = 'NEXT_MONTH',
+  ALL = 'ALL',
+}
+
 export interface IApiResponse<T> {
   data: T;
   error?: string;
@@ -27,36 +40,44 @@ interface CreateTodoArgs {
 
 const api = new Api({
   baseUrl:
-    "https://todo-app.whitewater-d0b6f62a.westeurope.azurecontainerapps.io/todo",
+    'https://todo-app.whitewater-d0b6f62a.westeurope.azurecontainerapps.io/todo',
 });
 
 const initialState: IState = {
   userPosts: { data: [], status: APIStatus.IDLE },
   createTodo: {
     data: {
-      title: "",
+      title: '',
       tags: [],
-      date: "",
+      date: '',
     },
     status: APIStatus.IDLE,
   },
   updateTodo: {
-    data: { title: "", tags: [], date: "" },
+    data: { title: '', tags: [], date: '' },
     status: APIStatus.IDLE,
   },
   deleteTodo: { data: null, status: APIStatus.IDLE },
 };
 
 export const fetchUserPosts = createAsyncThunk(
-  "todoSlice/fetchUserPosts",
-  async (userId: string) => {
-    const res = await api.userId.tasksDetail(userId);
-    return res.data;
+  'todoSlice/fetchUserPosts',
+  async ({ userId, fil }: { userId: string; fil?: DateFilter }) => {
+    console.log(userId, fil);
+    if (fil && fil !== DateFilter.ALL) {
+      const res = await api.userId.tasksDetail(userId, {
+        filter: fil,
+      });
+      return res.data;
+    } else {
+      const res = await api.userId.tasksDetail(userId);
+      return res.data;
+    }
   }
 );
 
 export const createNewTodo = createAsyncThunk(
-  "createTodoSlice/createNewTodo",
+  'createTodoSlice/createNewTodo',
   async ({ userId, todo }: CreateTodoArgs) => {
     const res = await api.userId.tasksCreate(userId, todo);
     return res.data;
@@ -64,7 +85,7 @@ export const createNewTodo = createAsyncThunk(
 );
 
 export const updateTodo = createAsyncThunk(
-  "createTodoSlice/updateTodo",
+  'createTodoSlice/updateTodo',
   async ({ userId, todo }: CreateTodoArgs) => {
     const updatedData: TaskUpdate = { ...todo, taskId: todo.taskId! };
     const res = await api.userId.tasksUpdate(todo.taskId!, userId, updatedData);
@@ -73,14 +94,14 @@ export const updateTodo = createAsyncThunk(
 );
 
 export const deleteTodo = createAsyncThunk(
-  "deleteTodoSlice/deleteTodo",
+  'deleteTodoSlice/deleteTodo',
   async ({ userId, todo }: CreateTodoArgs) => {
     await api.userId.tasksDelete(todo.taskId!, userId);
   }
 );
 
 export const todoSlice = createSlice({
-  name: "todo",
+  name: 'todo',
   initialState,
   reducers: {},
   extraReducers(builder) {
@@ -90,7 +111,7 @@ export const todoSlice = createSlice({
       })
       .addCase(fetchUserPosts.rejected, (state) => {
         state.userPosts.status = APIStatus.FAILED;
-        state.userPosts.error = "Some Error Occured";
+        state.userPosts.error = 'Some Error Occured';
       })
       .addCase(fetchUserPosts.fulfilled, (state, action) => {
         state.userPosts.status = APIStatus.FULLFILLED;
