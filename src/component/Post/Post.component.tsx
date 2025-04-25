@@ -6,7 +6,7 @@ import { Button, Chip, IconButton, Menu, MenuItem } from "@mui/material";
 import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 import { convertStatusToLabel } from "../../helper";
-import { Task, TaskStatus } from "../../myApi";
+import { Tag, Task, TaskStatus } from "../../myApi";
 import { useAppDispatch, useAppSelector } from "../../store/hook";
 import { deleteTodo } from "../../store/todo.slice";
 import "./index.css";
@@ -27,6 +27,7 @@ export const Post = ({
   const allTags = useAppSelector((state) => state.tagSlice.allTags.data);
   const { userId } = useParams();
   const [tagMenu, setTagMenu] = useState<null | HTMLElement>(null);
+  const [selectedTag, setSelectedTag] = useState<string[]>([]);
 
   const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
     setTagMenu(e.currentTarget);
@@ -37,6 +38,11 @@ export const Post = ({
 
   const handleCloseMenu = () => {
     setTagMenu(null);
+  };
+  const handleMenuItemClick = (tag: Tag) => {
+    setSelectedTag((prevTag) => [...prevTag, tag.name]);
+    console.log(selectedTag);
+    handleCloseMenu();
   };
 
   const handledeletePost = () => {
@@ -63,7 +69,7 @@ export const Post = ({
         >
           {allTags?.length > 0 ? (
             allTags.map((tag: { id: number; name: string }) => (
-              <MenuItem key={tag.id} onClick={handleCloseMenu}>
+              <MenuItem key={tag.id} onClick={() => handleMenuItemClick(tag)}>
                 {tag.name}
               </MenuItem>
             ))
@@ -91,6 +97,7 @@ export const Post = ({
           color: "#000000",
         }}
       />
+      <div>{selectedTag}</div>
     </div>
   );
 };
