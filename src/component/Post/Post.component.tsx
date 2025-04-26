@@ -1,17 +1,16 @@
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import { Button, Chip, IconButton, Menu, MenuItem } from "@mui/material";
-import dayjs from "dayjs";
-import { useParams } from "react-router-dom";
-import { convertStatusToLabel } from "../../helper";
-import { Tag, Task, TaskStatus } from "../../myApi";
-import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { deleteTodo } from "../../store/todo.slice";
-import "./index.css";
-import { tags } from "../../store/tag.slice";
-import { useState } from "react";
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { Button, Chip, IconButton, Menu, MenuItem } from '@mui/material';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { convertStatusToLabel } from '../../helper';
+import { Tag, Task, TaskStatus } from '../../myApi';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { deleteTodo, updateTodo } from '../../store/todo.slice';
+import './index.css';
 
 export const Post = ({
   task,
@@ -31,17 +30,40 @@ export const Post = ({
 
   const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
     setTagMenu(e.currentTarget);
-    if (userId) {
-      dispatch(tags(userId));
-    }
   };
+
+  useEffect(() => {
+    const tagsMapping: string[] = [];
+    task.tags.forEach((tag) => {
+      allTags.forEach((t) => {
+        if (t.id == tag.tagId) {
+          tagsMapping.push(t.name);
+        }
+      });
+    });
+    setSelectedTag(tagsMapping);
+  }, []);
 
   const handleCloseMenu = () => {
     setTagMenu(null);
   };
   const handleMenuItemClick = (tag: Tag) => {
-    setSelectedTag((prevTag) => [...prevTag, tag.name]);
-    console.log(selectedTag);
+    if (userId) {
+      dispatch(
+        updateTodo({
+          userId,
+          todo: {
+            ...task,
+            tags: [
+              ...task.tags,
+              {
+                tagId: tag.id,
+              },
+            ],
+          },
+        })
+      );
+    }
     handleCloseMenu();
   };
 
@@ -50,8 +72,8 @@ export const Post = ({
   };
 
   return (
-    <div className="post">
-      <div className="post-title">
+    <div className='post'>
+      <div className='post-title'>
         <AssignmentIcon />
         <h2>{task.title}</h2>
 
@@ -78,23 +100,23 @@ export const Post = ({
           )}
         </Menu>
       </div>
-      <p className="post-description">{task.description}</p>
+      <p className='post-description'>{task.description}</p>
 
-      <div className="post-date">
+      <div className='post-date'>
         <CalendarMonthIcon />
-        <p>{dayjs(task.date).format("D MMM YY")}</p>
+        <p>{dayjs(task.date).format('D MMM YY')}</p>
       </div>
       <Chip
         label={convertStatusToLabel(task.status!)}
-        variant="filled"
+        variant='filled'
         sx={{
           backgroundColor:
             task.status === TaskStatus.COMPLETED
-              ? "#c8e6c9"
+              ? '#c8e6c9'
               : task.status === TaskStatus.IN_PROGRESS
-                ? "#bbdefb"
-                : "#ffe0b2",
-          color: "#000000",
+                ? '#bbdefb'
+                : '#ffe0b2',
+          color: '#000000',
         }}
       />
       <div>{selectedTag}</div>
