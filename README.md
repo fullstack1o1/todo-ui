@@ -18,5 +18,8 @@ Next steps
 1. CRUD (create updated Delete) of tag
 2. attach a tag to todo
 3. get todo based on tag
+4. Make a diff page to handle edit, delete of tag
+5. Update the css to look better
+6.
 
 # todo-ui

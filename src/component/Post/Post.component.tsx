@@ -2,7 +2,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Button, Chip, IconButton, Menu, MenuItem } from '@mui/material';
+import { Chip, IconButton } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { convertStatusToLabel } from '../../helper';
 import { Tag, Task, TaskStatus } from '../../myApi';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
 import { deleteTodo, updateTodo } from '../../store/todo.slice';
+import TagsMenu from '../TagsMenu.component';
 import './index.css';
 
 export const Post = ({
@@ -25,12 +26,7 @@ export const Post = ({
   const dispatch = useAppDispatch();
   const allTags = useAppSelector((state) => state.tagSlice.allTags.data);
   const { userId } = useParams();
-  const [tagMenu, setTagMenu] = useState<null | HTMLElement>(null);
   const [selectedTag, setSelectedTag] = useState<string[]>([]);
-
-  const handleMenuClick = (e: React.MouseEvent<HTMLElement>) => {
-    setTagMenu(e.currentTarget);
-  };
 
   useEffect(() => {
     const tagsMapping: string[] = [];
@@ -44,9 +40,6 @@ export const Post = ({
     setSelectedTag(tagsMapping);
   }, []);
 
-  const handleCloseMenu = () => {
-    setTagMenu(null);
-  };
   const handleMenuItemClick = (tag: Tag) => {
     if (userId) {
       dispatch(
@@ -64,7 +57,6 @@ export const Post = ({
         })
       );
     }
-    handleCloseMenu();
   };
 
   const handledeletePost = () => {
@@ -74,32 +66,22 @@ export const Post = ({
   return (
     <div className='post'>
       <div className='post-title'>
-        <AssignmentIcon />
-        <h2>{task.title}</h2>
+        <div className='title'>
+          <AssignmentIcon />
+          <h2>{task.title}</h2>
+        </div>
 
-        <IconButton onClick={openAndPopulateModal}>
-          <EditIcon />
-        </IconButton>
-        <IconButton onClick={handledeletePost}>
-          <DeleteIcon />
-        </IconButton>
-        <Button onClick={handleMenuClick}>Tags</Button>
-        <Menu
-          anchorEl={tagMenu}
-          open={Boolean(tagMenu)}
-          onClose={handleCloseMenu}
-        >
-          {allTags?.length > 0 ? (
-            allTags.map((tag: { id: number; name: string }) => (
-              <MenuItem key={tag.id} onClick={() => handleMenuItemClick(tag)}>
-                {tag.name}
-              </MenuItem>
-            ))
-          ) : (
-            <MenuItem disabled>No Tags Available</MenuItem>
-          )}
-        </Menu>
+        <div className='actions'>
+          <TagsMenu handleMenuItemClick={handleMenuItemClick} />
+          <IconButton onClick={openAndPopulateModal}>
+            <EditIcon fontSize='small' />
+          </IconButton>
+          <IconButton onClick={handledeletePost}>
+            <DeleteIcon fontSize='small' />
+          </IconButton>
+        </div>
       </div>
+
       <p className='post-description'>{task.description}</p>
 
       <div className='post-date'>
@@ -119,7 +101,11 @@ export const Post = ({
           color: '#000000',
         }}
       />
-      <div>{selectedTag}</div>
+      <div className='tags'>
+        {selectedTag.map((t) => (
+          <Chip size='small' label={t} />
+        ))}
+      </div>
     </div>
   );
 };

@@ -10,18 +10,26 @@
   background-color: white;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   width: 300px;
-  height: 150px;
+  height: 250px;
   text-align: center;
 }
 
 .post .mui_chip {
   margin-top: auto;
 }
-.post-title,
+.post-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
 .post-date {
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 }
 .post-title h2,
 .post-date p,
@@ -30,4 +38,13 @@
 }
 .post-description {
   text-align: left;
+}
+
+.tags,
+.actions,
+.title {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
 }
