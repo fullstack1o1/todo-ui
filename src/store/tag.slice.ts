@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Api, Tag } from "../myApi";
+import { Api, Tag, Task } from "../myApi";
 import { APIStatus, IApiResponse } from "./todo.slice";
 
 interface Istate {
   createTag: IApiResponse<Tag>;
   allTags: IApiResponse<Tag[]>;
+  taskByTag: IApiResponse<Task[]>;
 }
 interface CreateTagArgs {
   tagName: string;
@@ -18,6 +19,10 @@ const initialState: Istate = {
   },
   createTag: {
     data: { name: "", id: 0 },
+    status: APIStatus.IDLE,
+  },
+  taskByTag: {
+    data: [],
     status: APIStatus.IDLE,
   },
 };
@@ -40,6 +45,15 @@ export const createNewTag = createAsyncThunk(
   "tagSlice/createNewTag",
   async ({ userId, tagName }: CreateTagArgs) => {
     const res = await api.userId.tagsCreate(userId, { name: tagName });
+    return res.data;
+  }
+);
+
+export const getTaskByTag = createAsyncThunk(
+  "tagSlice/taskByTag",
+  async ({ userId, tagId }: { userId: string; tagId: string }) => {
+    const res = await api.userId.tasksDetail3(Number(userId), Number(tagId));
+    console.log("Fetched tasks by tag:", res.data);
     return res.data;
   }
 );
@@ -69,9 +83,19 @@ export const tagSlice = createSlice({
       .addCase(tags.fulfilled, (state, action) => {
         state.allTags.status = APIStatus.FULLFILLED;
         state.allTags.data = action.payload;
+      })
+      .addCase(getTaskByTag.pending, (state) => {
+        state.taskByTag.status = APIStatus.PENDING;
+      })
+      .addCase(getTaskByTag.rejected, (state) => {
+        state.taskByTag.status = APIStatus.FAILED;
+      })
+      .addCase(getTaskByTag.fulfilled, (state, action) => {
+        state.taskByTag.status = APIStatus.FULLFILLED;
+        state.taskByTag.data = action.payload;
       });
   },
 });
 
-tagSlice.actions = { createNewTag, tags };
+tagSlice.actions = { createNewTag, tags, getTaskByTag };
 export default tagSlice.reducer;

@@ -1,8 +1,8 @@
-import NewLabelIcon from '@mui/icons-material/NewLabel';
-import { IconButton, Menu, MenuItem } from '@mui/material';
-import { useState } from 'react';
-import { Tag } from '../myApi';
-import { useAppSelector } from '../store/hook';
+import NewLabelIcon from "@mui/icons-material/NewLabel";
+import { IconButton, Menu, MenuItem } from "@mui/material";
+import { useState } from "react";
+import { Tag } from "../myApi";
+import { useAppSelector } from "../store/hook";
 
 interface Props {
   handleMenuItemClick: (tag: Tag) => void;
@@ -22,7 +22,7 @@ const TagsMenu = ({ handleMenuItemClick }: Props) => {
 
   return (
     <div>
-      <IconButton onClick={handleMenuClick} size='small'>
+      <IconButton onClick={handleMenuClick} size="small">
         <NewLabelIcon />
       </IconButton>
       <Menu
