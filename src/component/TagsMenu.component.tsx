@@ -5,7 +5,7 @@ import { Tag } from "../myApi";
 import { useAppSelector } from "../store/hook";
 
 interface Props {
-  handleMenuItemClick: (tag: Tag) => void;
+  handleMenuItemClick: (tag: Tag | null) => void;
 }
 
 const TagsMenu = ({ handleMenuItemClick }: Props) => {
@@ -20,6 +20,11 @@ const TagsMenu = ({ handleMenuItemClick }: Props) => {
     setTagMenu(null);
   };
 
+  const handleClick = (tag: Tag | null) => {
+    handleMenuItemClick(tag);
+    handleCloseMenu();
+  };
+
   return (
     <div>
       <IconButton onClick={handleMenuClick} size="small">
@@ -30,6 +35,7 @@ const TagsMenu = ({ handleMenuItemClick }: Props) => {
         open={Boolean(tagMenu)}
         onClose={handleCloseMenu}
       >
+        <MenuItem onClick={() => handleClick(null)}>All Tags</MenuItem>
         {allTags?.length > 0 ? (
           allTags.map((tag: { id: number; name: string }) => (
             <MenuItem key={tag.id} onClick={() => handleMenuItemClick(tag)}>

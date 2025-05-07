@@ -39,7 +39,7 @@ export const UserPosts = () => {
   type ModalType = "CREATE_TODO" | "CREATE_TAG" | null;
   const [open, setOpen] = useState<ModalType>(null);
   const [filter, setFilter] = useState<DateFilter>(DateFilter.ALL);
-  //const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const initialData = {
     description: "",
     title: "",
@@ -91,15 +91,21 @@ export const UserPosts = () => {
   const handleDateFilterChange = (e: any) => {
     console.log(e);
     setFilter(e.target.value);
+    setSelectedTag(null);
     dispatch(fetchUserPosts({ userId: userId!, fil: e.target.value }));
   };
-  const handleMenuItemClick = (tag: Tag) => {
-    //setSelectedTag(tag);
+  const handleMenuItemClick = (tag: Tag | null) => {
+    setSelectedTag(tag);
+    console.log("handle menu item click", tag);
     if (userId) {
-      dispatch(getTaskByTag({ userId, tagId: tag.id.toString() }));
+      if (tag) {
+        dispatch(getTaskByTag({ userId, tagId: tag.id.toString() }));
+      } else {
+        dispatch(fetchUserPosts({ userId, fil: filter }));
+      }
     }
   };
-
+  const postsToShow = selectedTag ? taskByTag.data : userPosts.data;
   return (
     <div className="parent">
       <div>
@@ -120,10 +126,8 @@ export const UserPosts = () => {
           <div className="user_name">
             <h1>User{userId}</h1>
           </div>
-          <div>
-            <TagsMenu handleMenuItemClick={handleMenuItemClick} />
-          </div>
           <div className="btn">
+            <TagsMenu handleMenuItemClick={handleMenuItemClick} />
             <Button variant="contained" onClick={() => openModal("CREATE_TAG")}>
               Create Tag
             </Button>
@@ -152,10 +156,10 @@ export const UserPosts = () => {
               Add new
             </Button>
           </div>
-          {userPosts.data.length > 0 ? (
+          {postsToShow.length > 0 ? (
             <>
               <div className="posts-wrapper">
-                {userPosts.data.map((post, index) => (
+                {postsToShow.map((post, index) => (
                   <Post task={post} key={index} openEditModal={openEditModal} />
                 ))}
               </div>

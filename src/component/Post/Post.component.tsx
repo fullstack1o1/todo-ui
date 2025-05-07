@@ -1,17 +1,17 @@
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import { Chip, IconButton } from '@mui/material';
-import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { convertStatusToLabel } from '../../helper';
-import { Tag, Task, TaskStatus } from '../../myApi';
-import { useAppDispatch, useAppSelector } from '../../store/hook';
-import { deleteTodo, updateTodo } from '../../store/todo.slice';
-import TagsMenu from '../TagsMenu.component';
-import './index.css';
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { Chip, IconButton } from "@mui/material";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { convertStatusToLabel } from "../../helper";
+import { Tag, Task, TaskStatus } from "../../myApi";
+import { useAppDispatch, useAppSelector } from "../../store/hook";
+import { deleteTodo, updateTodo } from "../../store/todo.slice";
+import TagsMenu from "../TagsMenu.component";
+import "./index.css";
 
 export const Post = ({
   task,
@@ -22,6 +22,7 @@ export const Post = ({
 }) => {
   const openAndPopulateModal = () => {
     openEditModal(task);
+    //console.log("open and populatemodal", task);
   };
   const dispatch = useAppDispatch();
   const allTags = useAppSelector((state) => state.tagSlice.allTags.data);
@@ -38,9 +39,11 @@ export const Post = ({
       });
     });
     setSelectedTag(tagsMapping);
-  }, []);
+  }, [task.tags]);
 
-  const handleMenuItemClick = (tag: Tag) => {
+  const handleMenuItemClick = (tag: Tag | null) => {
+    if (!tag || !userId) return;
+
     if (userId) {
       dispatch(
         updateTodo({
@@ -64,46 +67,46 @@ export const Post = ({
   };
 
   return (
-    <div className='post'>
-      <div className='post-title'>
-        <div className='title'>
+    <div className="post">
+      <div className="post-title">
+        <div className="title">
           <AssignmentIcon />
           <h2>{task.title}</h2>
         </div>
 
-        <div className='actions'>
+        <div className="actions">
           <TagsMenu handleMenuItemClick={handleMenuItemClick} />
           <IconButton onClick={openAndPopulateModal}>
-            <EditIcon fontSize='small' />
+            <EditIcon fontSize="small" />
           </IconButton>
           <IconButton onClick={handledeletePost}>
-            <DeleteIcon fontSize='small' />
+            <DeleteIcon fontSize="small" />
           </IconButton>
         </div>
       </div>
 
-      <p className='post-description'>{task.description}</p>
+      <p className="post-description">{task.description}</p>
 
-      <div className='post-date'>
+      <div className="post-date">
         <CalendarMonthIcon />
-        <p>{dayjs(task.date).format('D MMM YY')}</p>
+        <p>{dayjs(task.date).format("D MMM YY")}</p>
       </div>
       <Chip
         label={convertStatusToLabel(task.status!)}
-        variant='filled'
+        variant="filled"
         sx={{
           backgroundColor:
             task.status === TaskStatus.COMPLETED
-              ? '#c8e6c9'
+              ? "#c8e6c9"
               : task.status === TaskStatus.IN_PROGRESS
-                ? '#bbdefb'
-                : '#ffe0b2',
-          color: '#000000',
+                ? "#bbdefb"
+                : "#ffe0b2",
+          color: "#000000",
         }}
       />
-      <div className='tags'>
+      <div className="tags">
         {selectedTag.map((t) => (
-          <Chip size='small' label={t} />
+          <Chip size="small" label={t} />
         ))}
       </div>
     </div>
