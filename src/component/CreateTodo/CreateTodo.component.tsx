@@ -4,7 +4,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Task, TaskStatus } from '../../myApi';
 import { useAppDispatch, useAppSelector } from '../../store/hook';
@@ -40,6 +40,11 @@ const CreateTodo = ({ onClose, data }: { onClose: () => void; data: Task }) => {
   });
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
 
+  useEffect(() => {
+    const sIds = data.tags.map((m) => m.tagId);
+    setSelectedTags(sIds);
+  }, [data]);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -64,6 +69,12 @@ const CreateTodo = ({ onClose, data }: { onClose: () => void; data: Task }) => {
     if (userId) {
       if (todo.taskId) {
         // Update the task
+        const tags = selectedTags.map((m) => {
+          return {
+            tagId: m,
+          };
+        });
+        todo.tags = tags;
         dispatch(updateTodo({ userId, todo }));
       } else {
         const localTodo = todo;
