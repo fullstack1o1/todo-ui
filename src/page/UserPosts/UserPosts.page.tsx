@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CreateTodo from "../../component/CreateTodo/CreateTodo.component";
 import { Post } from "../../component/Post/Post.component";
 import CreateTag from "../../component/Tag/CreateTag.component";
@@ -20,6 +21,7 @@ import TagsMenu from "../../component/TagsMenu.component";
 
 export const UserPosts = () => {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   // const allTags = useAppSelector((state) => state.tagSlice.allTags.data);
   const { userPosts } = useAppSelector((state) => state.todoSlice);
@@ -130,6 +132,13 @@ export const UserPosts = () => {
             <TagsMenu handleMenuItemClick={handleMenuItemClick} />
             <Button variant="contained" onClick={() => openModal("CREATE_TAG")}>
               Create Tag
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => navigate(`/user/${userId}/delete-tag`)}
+            >
+              Delete Tag
             </Button>
             <Select
               labelId="demo-simple-select-label"
