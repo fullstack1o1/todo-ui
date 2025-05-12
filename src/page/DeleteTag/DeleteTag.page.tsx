@@ -1,16 +1,18 @@
-import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { List, ListItem, IconButton, ListItemText } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import "./index.css";
-import { useEffect, useState } from "react";
-import CreateTag from "../../component/Tag/CreateTag.component";
-import { Tag } from "../../myApi";
-import { useParams } from "react-router";
-import { APIStatus } from "../../store/todo.slice";
-import { deleteTag, tags } from "../../store/tag.slice";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { IconButton, List, ListItem, ListItemText } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import CreateTag from '../../component/Tag/CreateTag.component';
+import { Tag } from '../../myApi';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { deleteTag, tags } from '../../store/tag.slice';
+import { APIStatus } from '../../store/todo.slice';
+import './index.css';
 
 const DeleteTag = () => {
+  const naviagate = useNavigate();
   const dispatch = useAppDispatch();
   const { userId } = useParams();
   const allTags = useAppSelector((state) => state.tagSlice.allTags.data);
@@ -31,8 +33,8 @@ const DeleteTag = () => {
     setOpen(true);
   };
   const handleDeleteClick = (tag: Tag) => {
-    console.log("from delete tag", userId);
-    console.log("from delete tag", tag.id);
+    console.log('from delete tag', userId);
+    console.log('from delete tag', tag.id);
     if (userId) {
       dispatch(deleteTag({ userId, tagId: tag.id }));
     }
@@ -45,7 +47,6 @@ const DeleteTag = () => {
   useEffect(() => {
     if (
       (updateTagStatus === APIStatus.FULLFILLED ||
-        createTagStatus === APIStatus.FULLFILLED ||
         deleteTagStatus === APIStatus.FULLFILLED) &&
       userId
     ) {
@@ -53,20 +54,33 @@ const DeleteTag = () => {
     }
   }, [updateTagStatus, createTagStatus, userId, deleteTagStatus]);
 
+  useEffect(() => {
+    if (userId) dispatch(tags(userId));
+  }, [userId]);
+
+  const goBack = () => {
+    naviagate(`/user/${userId}`);
+  };
+
   return (
-    <div className="delete-tag-container">
-      <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
+    <div className='delete-tag-container'>
+      <div className='fixed'>
+        <IconButton onClick={goBack}>
+          <ArrowBackIcon fontSize='medium' />
+        </IconButton>
+      </div>
+      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
         {allTags.map((tag) => (
           <ListItem
             key={tag.id}
             disableGutters
             secondaryAction={
-              <div className="actions">
+              <div className='actions'>
                 <IconButton onClick={() => handleEditClick(tag)}>
-                  <EditIcon fontSize="small" />
+                  <EditIcon fontSize='small' />
                 </IconButton>
                 <IconButton onClick={() => handleDeleteClick(tag)}>
-                  <DeleteIcon fontSize="small" />
+                  <DeleteIcon fontSize='small' />
                 </IconButton>
               </div>
             }

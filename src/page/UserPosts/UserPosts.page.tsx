@@ -1,23 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   Button,
   CircularProgress,
+  IconButton,
   MenuItem,
   Modal,
   Select,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import CreateTodo from "../../component/CreateTodo/CreateTodo.component";
-import { Post } from "../../component/Post/Post.component";
-import CreateTag from "../../component/Tag/CreateTag.component";
-import { Tag, Task, TaskStatus } from "../../myApi";
-import { useAppDispatch, useAppSelector } from "../../store/hook";
-import { getTaskByTag, tags } from "../../store/tag.slice";
-import { APIStatus, DateFilter, fetchUserPosts } from "../../store/todo.slice";
-import "./index.css";
-import TagsMenu from "../../component/TagsMenu.component";
+} from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import CreateTodo from '../../component/CreateTodo/CreateTodo.component';
+import { Post } from '../../component/Post/Post.component';
+import CreateTag from '../../component/Tag/CreateTag.component';
+import TagsMenu from '../../component/TagsMenu.component';
+import { Tag, Task, TaskStatus } from '../../myApi';
+import { useAppDispatch, useAppSelector } from '../../store/hook';
+import { getTaskByTag, tags } from '../../store/tag.slice';
+import { APIStatus, DateFilter, fetchUserPosts } from '../../store/todo.slice';
+import './index.css';
 
 export const UserPosts = () => {
   const { userId } = useParams();
@@ -38,14 +39,14 @@ export const UserPosts = () => {
   const deleteTodoStatus = useAppSelector(
     (state) => state.todoSlice.deleteTodo.status
   );
-  type ModalType = "CREATE_TODO" | "CREATE_TAG" | null;
+  type ModalType = 'CREATE_TODO' | 'CREATE_TAG' | null;
   const [open, setOpen] = useState<ModalType>(null);
   const [filter, setFilter] = useState<DateFilter>(DateFilter.ALL);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const initialData = {
-    description: "",
-    title: "",
-    date: "",
+    description: '',
+    title: '',
+    date: '',
     status: TaskStatus.PENDING,
     tags: [],
   };
@@ -85,9 +86,9 @@ export const UserPosts = () => {
   };
 
   const openEditModal = (task: Task) => {
-    console.log("open edit modal", task);
+    console.log('open edit modal', task);
     setEditModalData(task);
-    openModal("CREATE_TODO");
+    openModal('CREATE_TODO');
   };
 
   const handleDateFilterChange = (e: any) => {
@@ -107,45 +108,55 @@ export const UserPosts = () => {
     }
   };
   const postsToShow = selectedTag ? taskByTag.data : userPosts.data;
+
+  const goBack = () => {
+    navigate('/');
+  };
+
   return (
-    <div className="parent">
+    <div className='parent'>
+      <div className='fixed'>
+        <IconButton onClick={goBack}>
+          <ArrowBackIcon fontSize='medium' />
+        </IconButton>
+      </div>
       <div>
         <Modal
-          open={open === "CREATE_TODO"}
+          open={open === 'CREATE_TODO'}
           onClose={closeModal}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+          aria-labelledby='modal-modal-title'
+          aria-describedby='modal-modal-description'
         >
           <CreateTodo onClose={closeModal} data={editModalData} />
         </Modal>
       </div>
-      <CreateTag open={open === "CREATE_TAG"} onClose={closeModal} />
+      <CreateTag open={open === 'CREATE_TAG'} onClose={closeModal} />
       {userPosts.status === APIStatus.PENDING ? (
         <CircularProgress />
       ) : (
-        <div className="posts">
-          <div className="user_name">
+        <div className='posts'>
+          <div className='user_name'>
             <h1>User{userId}</h1>
           </div>
-          <div className="btn">
+          <div className='btn'>
             <TagsMenu handleMenuItemClick={handleMenuItemClick} />
-            <Button variant="contained" onClick={() => openModal("CREATE_TAG")}>
+            <Button variant='contained' onClick={() => openModal('CREATE_TAG')}>
               Create Tag
             </Button>
             <Button
-              variant="contained"
-              color="error"
+              variant='contained'
+              color='error'
               onClick={() => navigate(`/user/${userId}/delete-tag`)}
             >
               Delete Tag
             </Button>
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId='demo-simple-select-label'
+              id='demo-simple-select'
               value={filter}
-              label="Age"
+              label='Age'
               onChange={handleDateFilterChange}
-              size="small"
+              size='small'
             >
               <MenuItem value={DateFilter.ALL}>All</MenuItem>
               <MenuItem value={DateFilter.TODAY_TODO}>Today</MenuItem>
@@ -158,15 +169,15 @@ export const UserPosts = () => {
             </Select>
 
             <Button
-              variant="contained"
-              onClick={() => openModal("CREATE_TODO")}
+              variant='contained'
+              onClick={() => openModal('CREATE_TODO')}
             >
               Add new
             </Button>
           </div>
           {postsToShow.length > 0 ? (
             <>
-              <div className="posts-wrapper">
+              <div className='posts-wrapper'>
                 {postsToShow.map((post, index) => (
                   <Post task={post} key={index} openEditModal={openEditModal} />
                 ))}
