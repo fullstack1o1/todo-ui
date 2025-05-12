@@ -1,8 +1,9 @@
 import { Box, Button, TextField, Typography, Modal } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppDispatch } from "../../store/hook";
-import { createNewTag } from "../../store/tag.slice";
+import { createNewTag, tags, updateTag } from "../../store/tag.slice";
+import { Tag } from "../../myApi";
 
 const boxStyle = {
   position: "absolute",
@@ -19,18 +20,27 @@ const boxStyle = {
 interface CreateTagProps {
   open: boolean;
   onClose: () => void;
+  tag?: Tag | null;
 }
 
-const CreateTag = ({ open, onClose }: CreateTagProps) => {
+const CreateTag = ({ open, onClose, tag }: CreateTagProps) => {
   const { userId } = useParams();
   const dispatch = useAppDispatch();
-  const [tagName, setTagName] = useState("");
+  const [tagName, setTagName] = useState(tag?.name || "");
 
-  const handleCreateTag = () => {
-    if (userId) {
+  useEffect(() => {
+    setTagName(tag?.name || "");
+  }, [tag]);
+
+  const handleSubmit = () => {
+    if (!userId) return;
+
+    if (tag?.id) {
+      dispatch(updateTag({ tagId: tag.id, userId, tagName }));
+      console.log("Edit tag", tag.id, tagName);
+    } else {
       dispatch(createNewTag({ userId, tagName }));
     }
-    console.log("Tag created:", tagName);
     onClose();
   };
 
@@ -38,7 +48,7 @@ const CreateTag = ({ open, onClose }: CreateTagProps) => {
     <Modal open={open} onClose={onClose}>
       <Box sx={boxStyle}>
         <Typography variant="h6" mb={2}>
-          Create a Tag
+          {tag?.id ? "Edit Tag" : "Create a Tag"}
         </Typography>
         <TextField
           label="Tag Name"
@@ -47,8 +57,8 @@ const CreateTag = ({ open, onClose }: CreateTagProps) => {
           fullWidth
           margin="normal"
         />
-        <Button variant="contained" fullWidth onClick={handleCreateTag}>
-          Create Tag
+        <Button variant="contained" fullWidth onClick={handleSubmit}>
+          {tag?.id ? "Update Tag" : "Create Tag"}
         </Button>
       </Box>
     </Modal>

@@ -98,7 +98,6 @@ export const UserPosts = () => {
   };
   const handleMenuItemClick = (tag: Tag | null) => {
     setSelectedTag(tag);
-    console.log("handle menu item click", tag);
     if (userId) {
       if (tag) {
         dispatch(getTaskByTag({ userId, tagId: tag.id.toString() }));
