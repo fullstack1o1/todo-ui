@@ -37,9 +37,9 @@ export interface UserPatch {
 }
 
 export enum TaskStatus {
-  PENDING = 'PENDING',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
 }
 
 export interface Task {
@@ -126,9 +126,9 @@ export interface TagRequest {
 }
 
 export type QueryParamsType = Record<string | number, any>;
-export type ResponseFormat = keyof Omit<Body, 'body' | 'bodyUsed'>;
+export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
-export interface FullRequestParams extends Omit<RequestInit, 'body'> {
+export interface FullRequestParams extends Omit<RequestInit, "body"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -147,22 +147,16 @@ export interface FullRequestParams extends Omit<RequestInit, 'body'> {
   cancelToken?: CancelToken;
 }
 
-export type RequestParams = Omit<
-  FullRequestParams,
-  'body' | 'method' | 'query' | 'path'
->;
+export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
 
 export interface ApiConfig<SecurityDataType = unknown> {
   baseUrl?: string;
-  baseApiParams?: Omit<RequestParams, 'baseUrl' | 'cancelToken' | 'signal'>;
-  securityWorker?: (
-    securityData: SecurityDataType | null
-  ) => Promise<RequestParams | void> | RequestParams | void;
+  baseApiParams?: Omit<RequestParams, "baseUrl" | "cancelToken" | "signal">;
+  securityWorker?: (securityData: SecurityDataType | null) => Promise<RequestParams | void> | RequestParams | void;
   customFetch?: typeof fetch;
 }
 
-export interface HttpResponse<D extends unknown, E extends unknown = unknown>
-  extends Response {
+export interface HttpResponse<D extends unknown, E extends unknown = unknown> extends Response {
   data: D;
   error: E;
 }
@@ -170,25 +164,24 @@ export interface HttpResponse<D extends unknown, E extends unknown = unknown>
 type CancelToken = Symbol | string | number;
 
 export enum ContentType {
-  Json = 'application/json',
-  FormData = 'multipart/form-data',
-  UrlEncoded = 'application/x-www-form-urlencoded',
-  Text = 'text/plain',
+  Json = "application/json",
+  FormData = "multipart/form-data",
+  UrlEncoded = "application/x-www-form-urlencoded",
+  Text = "text/plain",
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = 'http://localhost:8080/todo';
+  public baseUrl: string = "http://localhost:8080/todo";
   private securityData: SecurityDataType | null = null;
-  private securityWorker?: ApiConfig<SecurityDataType>['securityWorker'];
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
-  private customFetch = (...fetchParams: Parameters<typeof fetch>) =>
-    fetch(...fetchParams);
+  private customFetch = (...fetchParams: Parameters<typeof fetch>) => fetch(...fetchParams);
 
   private baseApiParams: RequestParams = {
-    credentials: 'same-origin',
+    credentials: "same-origin",
     headers: {},
-    redirect: 'follow',
-    referrerPolicy: 'no-referrer',
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
   };
 
   constructor(apiConfig: ApiConfig<SecurityDataType> = {}) {
@@ -201,7 +194,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   protected encodeQueryParam(key: string, value: any) {
     const encodedKey = encodeURIComponent(key);
-    return `${encodedKey}=${encodeURIComponent(typeof value === 'number' ? value : `${value}`)}`;
+    return `${encodedKey}=${encodeURIComponent(typeof value === "number" ? value : `${value}`)}`;
   }
 
   protected addQueryParam(query: QueryParamsType, key: string) {
@@ -210,37 +203,26 @@ export class HttpClient<SecurityDataType = unknown> {
 
   protected addArrayQueryParam(query: QueryParamsType, key: string) {
     const value = query[key];
-    return value.map((v: any) => this.encodeQueryParam(key, v)).join('&');
+    return value.map((v: any) => this.encodeQueryParam(key, v)).join("&");
   }
 
   protected toQueryString(rawQuery?: QueryParamsType): string {
     const query = rawQuery || {};
-    const keys = Object.keys(query).filter(
-      (key) => 'undefined' !== typeof query[key]
-    );
+    const keys = Object.keys(query).filter((key) => "undefined" !== typeof query[key]);
     return keys
-      .map((key) =>
-        Array.isArray(query[key])
-          ? this.addArrayQueryParam(query, key)
-          : this.addQueryParam(query, key)
-      )
-      .join('&');
+      .map((key) => (Array.isArray(query[key]) ? this.addArrayQueryParam(query, key) : this.addQueryParam(query, key)))
+      .join("&");
   }
 
   protected addQueryParams(rawQuery?: QueryParamsType): string {
     const queryString = this.toQueryString(rawQuery);
-    return queryString ? `?${queryString}` : '';
+    return queryString ? `?${queryString}` : "";
   }
 
   private contentFormatters: Record<ContentType, (input: any) => any> = {
     [ContentType.Json]: (input: any) =>
-      input !== null && (typeof input === 'object' || typeof input === 'string')
-        ? JSON.stringify(input)
-        : input,
-    [ContentType.Text]: (input: any) =>
-      input !== null && typeof input !== 'string'
-        ? JSON.stringify(input)
-        : input,
+      input !== null && (typeof input === "object" || typeof input === "string") ? JSON.stringify(input) : input,
+    [ContentType.Text]: (input: any) => (input !== null && typeof input !== "string" ? JSON.stringify(input) : input),
     [ContentType.FormData]: (input: any) =>
       Object.keys(input || {}).reduce((formData, key) => {
         const property = input[key];
@@ -248,19 +230,16 @@ export class HttpClient<SecurityDataType = unknown> {
           key,
           property instanceof Blob
             ? property
-            : typeof property === 'object' && property !== null
+            : typeof property === "object" && property !== null
               ? JSON.stringify(property)
-              : `${property}`
+              : `${property}`,
         );
         return formData;
       }, new FormData()),
     [ContentType.UrlEncoded]: (input: any) => this.toQueryString(input),
   };
 
-  protected mergeRequestParams(
-    params1: RequestParams,
-    params2?: RequestParams
-  ): RequestParams {
+  protected mergeRequestParams(params1: RequestParams, params2?: RequestParams): RequestParams {
     return {
       ...this.baseApiParams,
       ...params1,
@@ -273,9 +252,7 @@ export class HttpClient<SecurityDataType = unknown> {
     };
   }
 
-  protected createAbortSignal = (
-    cancelToken: CancelToken
-  ): AbortSignal | undefined => {
+  protected createAbortSignal = (cancelToken: CancelToken): AbortSignal | undefined => {
     if (this.abortControllers.has(cancelToken)) {
       const abortController = this.abortControllers.get(cancelToken);
       if (abortController) {
@@ -310,7 +287,7 @@ export class HttpClient<SecurityDataType = unknown> {
     ...params
   }: FullRequestParams): Promise<HttpResponse<T, E>> => {
     const secureParams =
-      ((typeof secure === 'boolean' ? secure : this.baseApiParams.secure) &&
+      ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
         this.securityWorker &&
         (await this.securityWorker(this.securityData))) ||
       {};
@@ -319,26 +296,15 @@ export class HttpClient<SecurityDataType = unknown> {
     const payloadFormatter = this.contentFormatters[type || ContentType.Json];
     const responseFormat = format || requestParams.format;
 
-    return this.customFetch(
-      `${baseUrl || this.baseUrl || ''}${path}${queryString ? `?${queryString}` : ''}`,
-      {
-        ...requestParams,
-        headers: {
-          ...(requestParams.headers || {}),
-          ...(type && type !== ContentType.FormData
-            ? { 'Content-Type': type }
-            : {}),
-        },
-        signal:
-          (cancelToken
-            ? this.createAbortSignal(cancelToken)
-            : requestParams.signal) || null,
-        body:
-          typeof body === 'undefined' || body === null
-            ? null
-            : payloadFormatter(body),
-      }
-    ).then(async (response) => {
+    return this.customFetch(`${baseUrl || this.baseUrl || ""}${path}${queryString ? `?${queryString}` : ""}`, {
+      ...requestParams,
+      headers: {
+        ...(requestParams.headers || {}),
+        ...(type && type !== ContentType.FormData ? { "Content-Type": type } : {}),
+      },
+      signal: (cancelToken ? this.createAbortSignal(cancelToken) : requestParams.signal) || null,
+      body: typeof body === "undefined" || body === null ? null : payloadFormatter(body),
+    }).then(async (response) => {
       const r = response.clone() as HttpResponse<T, E>;
       r.data = null as unknown as T;
       r.error = null as unknown as E;
@@ -376,9 +342,7 @@ export class HttpClient<SecurityDataType = unknown> {
  *
  * API for managing users, tasks, and tags in a ToDo application
  */
-export class Api<
-  SecurityDataType extends unknown,
-> extends HttpClient<SecurityDataType> {
+export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
   users = {
     /**
      * No description
@@ -390,8 +354,8 @@ export class Api<
     usersList: (params: RequestParams = {}) =>
       this.request<User[], any>({
         path: `/users`,
-        method: 'GET',
-        format: 'json',
+        method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -405,10 +369,10 @@ export class Api<
     usersCreate: (data: User, params: RequestParams = {}) =>
       this.request<User, any>({
         path: `/users`,
-        method: 'POST',
+        method: "POST",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -422,8 +386,8 @@ export class Api<
     usersDetail: (userId: number, params: RequestParams = {}) =>
       this.request<User, void>({
         path: `/users/${userId}`,
-        method: 'GET',
-        format: 'json',
+        method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -434,17 +398,13 @@ export class Api<
      * @summary Update a user
      * @request PUT:/users/{userId}
      */
-    usersUpdate: (
-      userId: number,
-      data: UserUpdate,
-      params: RequestParams = {}
-    ) =>
+    usersUpdate: (userId: number, data: UserUpdate, params: RequestParams = {}) =>
       this.request<User, void>({
         path: `/users/${userId}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -455,17 +415,13 @@ export class Api<
      * @summary Partial Update a user
      * @request PATCH:/users/{userId}
      */
-    usersPartialUpdate: (
-      userId: number,
-      data: UserPatch,
-      params: RequestParams = {}
-    ) =>
+    usersPartialUpdate: (userId: number, data: UserPatch, params: RequestParams = {}) =>
       this.request<User, void>({
         path: `/users/${userId}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -479,7 +435,7 @@ export class Api<
     usersDelete: (userId: number, params: RequestParams = {}) =>
       this.request<void, void>({
         path: `/users/${userId}`,
-        method: 'DELETE',
+        method: "DELETE",
         ...params,
       }),
   };
@@ -495,22 +451,22 @@ export class Api<
       userId: string,
       query?: {
         filter?:
-          | 'TODAY_TODO'
-          | 'TOMORROW_TODO'
-          | 'CURRENT_WEEK_TODO'
-          | 'LAST_WEEK_TODO'
-          | 'NEXT_WEEK_TODO'
-          | 'LAST_MONTH'
-          | 'CURRENT_MONTH'
-          | 'NEXT_MONTH';
+          | "TODAY_TODO"
+          | "TOMORROW_TODO"
+          | "CURRENT_WEEK_TODO"
+          | "LAST_WEEK_TODO"
+          | "NEXT_WEEK_TODO"
+          | "LAST_MONTH"
+          | "CURRENT_MONTH"
+          | "NEXT_MONTH";
       },
-      params: RequestParams = {}
+      params: RequestParams = {},
     ) =>
       this.request<TagTask, any>({
         path: `/${userId}/tasks`,
-        method: 'GET',
+        method: "GET",
         query: query,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -521,17 +477,13 @@ export class Api<
      * @summary Create a new task
      * @request POST:/{userId}/tasks
      */
-    tasksCreate: (
-      userId: string,
-      data: TaskRequest,
-      params: RequestParams = {}
-    ) =>
+    tasksCreate: (userId: string, data: TaskRequest, params: RequestParams = {}) =>
       this.request<Task, any>({
         path: `/${userId}/tasks`,
-        method: 'POST',
+        method: "POST",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -544,15 +496,11 @@ export class Api<
      * @originalName tasksDetail
      * @duplicate
      */
-    tasksDetail2: (
-      taskId: number,
-      userId: string,
-      params: RequestParams = {}
-    ) =>
+    tasksDetail2: (taskId: number, userId: string, params: RequestParams = {}) =>
       this.request<Task, void>({
         path: `/${userId}/tasks/${taskId}`,
-        method: 'GET',
-        format: 'json',
+        method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -563,18 +511,13 @@ export class Api<
      * @summary Update a task
      * @request PUT:/{userId}/tasks/{taskId}
      */
-    tasksUpdate: (
-      taskId: number,
-      userId: string,
-      data: TaskUpdate,
-      params: RequestParams = {}
-    ) =>
+    tasksUpdate: (taskId: number, userId: string, data: TaskUpdate, params: RequestParams = {}) =>
       this.request<Task, void>({
         path: `/${userId}/tasks/${taskId}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -585,18 +528,13 @@ export class Api<
      * @summary Partial Update a task
      * @request PATCH:/{userId}/tasks/{taskId}
      */
-    tasksPartialUpdate: (
-      taskId: number,
-      userId: string,
-      data: TaskPatch,
-      params: RequestParams = {}
-    ) =>
+    tasksPartialUpdate: (taskId: number, userId: string, data: TaskPatch, params: RequestParams = {}) =>
       this.request<Task, void>({
         path: `/${userId}/tasks/${taskId}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -610,7 +548,7 @@ export class Api<
     tasksDelete: (taskId: number, userId: string, params: RequestParams = {}) =>
       this.request<void, void>({
         path: `/${userId}/tasks/${taskId}`,
-        method: 'DELETE',
+        method: "DELETE",
         ...params,
       }),
 
@@ -624,8 +562,8 @@ export class Api<
     tagsDetail: (userId: string, params: RequestParams = {}) =>
       this.request<Tag[], any>({
         path: `/${userId}/tags`,
-        method: 'GET',
-        format: 'json',
+        method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -636,17 +574,13 @@ export class Api<
      * @summary Create a new tag
      * @request POST:/{userId}/tags
      */
-    tagsCreate: (
-      userId: string,
-      data: TagRequest,
-      params: RequestParams = {}
-    ) =>
+    tagsCreate: (userId: string, data: TagRequest, params: RequestParams = {}) =>
       this.request<Tag, any>({
         path: `/${userId}/tags`,
-        method: 'POST',
+        method: "POST",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -662,8 +596,8 @@ export class Api<
     tagsDetail2: (tagId: number, userId: string, params: RequestParams = {}) =>
       this.request<Tag, void>({
         path: `/${userId}/tags/${tagId}`,
-        method: 'GET',
-        format: 'json',
+        method: "GET",
+        format: "json",
         ...params,
       }),
 
@@ -674,18 +608,13 @@ export class Api<
      * @summary Update a tag
      * @request PUT:/{userId}/tags/{tagId}
      */
-    tagsUpdate: (
-      tagId: number,
-      userId: string,
-      data: TagUpdate,
-      params: RequestParams = {}
-    ) =>
+    tagsUpdate: (tagId: number, userId: string, data: TagUpdate, params: RequestParams = {}) =>
       this.request<Tag, void>({
         path: `/${userId}/tags/${tagId}`,
-        method: 'PUT',
+        method: "PUT",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -696,18 +625,13 @@ export class Api<
      * @summary Partial Update a tag
      * @request PATCH:/{userId}/tags/{tagId}
      */
-    tagsPartialUpdate: (
-      tagId: number,
-      userId: string,
-      data: TagPatch,
-      params: RequestParams = {}
-    ) =>
+    tagsPartialUpdate: (tagId: number, userId: string, data: TagPatch, params: RequestParams = {}) =>
       this.request<Tag, void>({
         path: `/${userId}/tags/${tagId}`,
-        method: 'PATCH',
+        method: "PATCH",
         body: data,
         type: ContentType.Json,
-        format: 'json',
+        format: "json",
         ...params,
       }),
 
@@ -721,7 +645,7 @@ export class Api<
     tagsDelete: (tagId: number, userId: string, params: RequestParams = {}) =>
       this.request<void, void>({
         path: `/${userId}/tags/${tagId}`,
-        method: 'DELETE',
+        method: "DELETE",
         ...params,
       }),
 
@@ -737,8 +661,23 @@ export class Api<
     tasksDetail3: (userId: number, tagId: number, params: RequestParams = {}) =>
       this.request<TagTask, void>({
         path: `/${userId}/tags/${tagId}/tasks`,
-        method: 'GET',
-        format: 'json',
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name NotificationDetail
+     * @summary Get due and past due tasks
+     * @request GET:/{userId}/notification
+     */
+    notificationDetail: (userId: number, params: RequestParams = {}) =>
+      this.request<TagTask, void>({
+        path: `/${userId}/notification`,
+        method: "GET",
+        format: "json",
         ...params,
       }),
   };

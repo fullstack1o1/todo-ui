@@ -106,7 +106,7 @@ export const Post = ({
       />
       <div className="tags">
         {selectedTag.map((t) => (
-          <Chip size="small" label={t} />
+          <Chip size="small" label={t} key={t} />
         ))}
       </div>
     </div>

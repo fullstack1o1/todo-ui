@@ -52,7 +52,6 @@ export const tags = createAsyncThunk(
   "tagSlice/getAllTag",
   async (userId: string) => {
     const res = await api.userId.tagsDetail(userId);
-    console.log("fetch tags", res.data);
     return res.data;
   }
 );
@@ -60,7 +59,6 @@ export const getTaskByTag = createAsyncThunk(
   "tagSlice/taskByTag",
   async ({ userId, tagId }: { userId: string; tagId: string }) => {
     const res = await api.userId.tasksDetail3(Number(userId), Number(tagId));
-    console.log("Fetched tasks by tag:", res.data);
     return res.data;
   }
 );
@@ -76,9 +74,7 @@ export const createNewTag = createAsyncThunk(
 export const deleteTag = createAsyncThunk(
   "tagSlice/deleteTag",
   async ({ tagId, userId }: { userId: string; tagId: number }) => {
-    const res = await api.userId.tagsDelete(tagId, userId);
-    console.log(res);
-    //return tagId;
+    await api.userId.tagsDelete(tagId, userId);
   }
 );
 

@@ -80,7 +80,7 @@ components:
         description:
           type: string
         status:
-          $ref: '#/components/schemas/TaskStatus'
+          $ref: "#/components/schemas/TaskStatus"
         date:
           type: string
           format: date
@@ -90,7 +90,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/TagReference'
+            $ref: "#/components/schemas/TagReference"
       required:
         - title
         - date
@@ -107,7 +107,7 @@ components:
         description:
           type: string
         status:
-          $ref: '#/components/schemas/TaskStatus'
+          $ref: "#/components/schemas/TaskStatus"
         date:
           type: string
           format: date
@@ -117,7 +117,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/TagReference'
+            $ref: "#/components/schemas/TagReference"
       required:
         - taskId
         - title
@@ -135,7 +135,7 @@ components:
         description:
           type: string
         status:
-          $ref: '#/components/schemas/TaskStatus'
+          $ref: "#/components/schemas/TaskStatus"
         date:
           type: string
           format: date
@@ -145,7 +145,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/TagReference'
+            $ref: "#/components/schemas/TagReference"
 
     TaskRequest:
       type: object
@@ -155,7 +155,7 @@ components:
         description:
           type: string
         status:
-          $ref: '#/components/schemas/TaskStatus'
+          $ref: "#/components/schemas/TaskStatus"
         date:
           type: string
           format: date
@@ -165,7 +165,7 @@ components:
         tags:
           type: array
           items:
-            $ref: '#/components/schemas/TagReference'
+            $ref: "#/components/schemas/TagReference"
       required:
         - title
         - date
@@ -185,7 +185,7 @@ components:
     TagTask:
       type: array
       items:
-        $ref: '#/components/schemas/Task'
+        $ref: "#/components/schemas/Task"
 
     Tag:
       type: object
@@ -233,14 +233,14 @@ paths:
     get:
       summary: Get all users
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/User"
     post:
       summary: Create a new user
       requestBody:
@@ -248,14 +248,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: "#/components/schemas/User"
       responses:
-        '201':
+        "201":
           description: User created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
 
   /users/{userId}:
     get:
@@ -268,13 +268,13 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
+                $ref: "#/components/schemas/User"
+        "404":
           description: User not found
 
     put:
@@ -291,15 +291,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdate'
+              $ref: "#/components/schemas/UserUpdate"
       responses:
-        '200':
+        "200":
           description: User updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
+                $ref: "#/components/schemas/User"
+        "404":
           description: User not found
 
     patch:
@@ -316,15 +316,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPatch'
+              $ref: "#/components/schemas/UserPatch"
       responses:
-        '200':
+        "200":
           description: User updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
-        '404':
+                $ref: "#/components/schemas/User"
+        "404":
           description: User not found
 
     delete:
@@ -337,9 +337,9 @@ paths:
             type: integer
             format: int64
       responses:
-        '204':
+        "204":
           description: User deleted successfully
-        '404':
+        "404":
           description: User not found
 
   /{userId}/tasks:
@@ -360,14 +360,14 @@ paths:
               - NEXT_MONTH
 
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Task'
+                  $ref: "#/components/schemas/Task"
     post:
       summary: Create a new task
       requestBody:
@@ -375,14 +375,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TaskRequest'
+              $ref: "#/components/schemas/TaskRequest"
       responses:
-        '201':
+        "201":
           description: Task created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
+                $ref: "#/components/schemas/Task"
 
   /{userId}/tasks/{taskId}:
     get:
@@ -395,13 +395,13 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
-        '404':
+                $ref: "#/components/schemas/Task"
+        "404":
           description: Task not found
 
     put:
@@ -418,15 +418,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TaskUpdate'
+              $ref: "#/components/schemas/TaskUpdate"
       responses:
-        '200':
+        "200":
           description: Task updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
-        '404':
+                $ref: "#/components/schemas/Task"
+        "404":
           description: Task not found
 
     patch:
@@ -443,15 +443,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TaskPatch'
+              $ref: "#/components/schemas/TaskPatch"
       responses:
-        '200':
+        "200":
           description: Task updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Task'
-        '404':
+                $ref: "#/components/schemas/Task"
+        "404":
           description: Task not found
 
     delete:
@@ -464,23 +464,23 @@ paths:
             type: integer
             format: int64
       responses:
-        '204':
+        "204":
           description: Task deleted successfully
-        '404':
+        "404":
           description: Task not found
 
   /{userId}/tags:
     get:
       summary: Get all tags
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Tag'
+                  $ref: "#/components/schemas/Tag"
     post:
       summary: Create a new tag
       requestBody:
@@ -488,14 +488,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TagRequest'
+              $ref: "#/components/schemas/TagRequest"
       responses:
-        '201':
+        "201":
           description: Tag created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: "#/components/schemas/Tag"
 
   /{userId}/tags/{tagId}:
     get:
@@ -508,13 +508,13 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
-        '404':
+                $ref: "#/components/schemas/Tag"
+        "404":
           description: Tag not found
 
     put:
@@ -531,15 +531,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TagUpdate'
+              $ref: "#/components/schemas/TagUpdate"
       responses:
-        '200':
+        "200":
           description: Tag updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
-        '404':
+                $ref: "#/components/schemas/Tag"
+        "404":
           description: Tag not found
 
     patch:
@@ -556,15 +556,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TagPatch'
+              $ref: "#/components/schemas/TagPatch"
       responses:
-        '200':
+        "200":
           description: Tag updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
-        '404':
+                $ref: "#/components/schemas/Tag"
+        "404":
           description: Tag not found
 
     delete:
@@ -577,9 +577,9 @@ paths:
             type: integer
             format: int64
       responses:
-        '204':
+        "204":
           description: Tag deleted successfully
-        '404':
+        "404":
           description: Tag not found
 
   /{userId}/tags/{tagId}/tasks:
@@ -599,11 +599,32 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TagTask'
-        '404':
+                $ref: "#/components/schemas/TagTask"
+        "404":
           description: Tag not found
+  /{userId}/notification:
+    get:
+      summary: Get due and past due tasks
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        "404":
+          description: No tasks found
