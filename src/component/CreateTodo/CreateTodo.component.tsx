@@ -142,8 +142,8 @@ const CreateTodo = ({ onClose, data }: { onClose: () => void; data: Task }) => {
 
       <MultipleSelectChip
         tags={allTags}
-        selectedIds={selectedTags}
-        setSelectedIds={setSelectedTags}
+        selectedIds={selectedTags.map((id) => id.toString())} // Ensure selectedIds is an array of strings
+        setSelectedIds={(ids) => setSelectedTags(ids.map((id) => parseInt(id, 10)))} // Convert string IDs back to numbers
       />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DemoContainer components={['DatePicker']}>
