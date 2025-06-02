@@ -77,6 +77,7 @@ export const UserPosts = () => {
     if (userId) {
       dispatch(fetchUserPosts({ userId }));
       dispatch(tags(userId));
+      dispatch(fetchNotifications(Number(userId)));
     }
   }, [userId]);
 
