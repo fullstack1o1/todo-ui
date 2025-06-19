@@ -6,7 +6,7 @@ import DeleteTag from "./page/DeleteTag/DeleteTag.page";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route index element={<HomePage />} />
         <Route path="/user/:userId" element={<UserPosts />} />
