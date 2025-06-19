@@ -2,11 +2,10 @@
   "name": "todo-ui",
   "private": true,
   "version": "0.0.0",
-  "homepage": "/todo-ui/",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build --base=/todo-ui/",
     "lint": "eslint .",
     "preview": "vite preview"
   },
