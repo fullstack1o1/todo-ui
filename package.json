@@ -2,6 +2,7 @@
   "name": "todo-ui",
   "private": true,
   "version": "0.0.0",
+  "homepage": "/todo-ui/",
   "type": "module",
   "scripts": {
     "dev": "vite",
